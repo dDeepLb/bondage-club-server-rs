@@ -1,0 +1,9 @@
+[package]
+name = "common"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+figment = { version = "0.10", features = ["env"] }
+serde = { version = "1", features = ["derive"] }
+dotenvy = "0.15"
