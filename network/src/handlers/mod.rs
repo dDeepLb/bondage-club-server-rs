@@ -1,15 +1,15 @@
+use axum::extract::ConnectInfo;
 use db::State;
 use socketioxide::{
-    SocketIo,
-    extract::{SocketRef},
+    extract::{HttpExtension, SocketRef}, SocketIo
 };
-use std::sync::Arc;
+use std::{net::SocketAddr, sync::Arc};
 
 pub fn register(io: &SocketIo, _state: Arc<State>) {
     io.ns(
         "/",
-        |socket: SocketRef| {
-            on_connect(socket);
+        |socket: SocketRef, client_ip: HttpExtension<ConnectInfo<SocketAddr>>| {
+            on_connect(socket, client_ip);
         },
     )
     // socket.on("AccountCreate", function (data) { AccountCreate(data, socket); });
@@ -18,14 +18,13 @@ pub fn register(io: &SocketIo, _state: Arc<State>) {
     // socket.on("PasswordResetProcess", function(data) { PasswordResetProcess(data, socket); });
 }
 
-fn on_connect(socket: SocketRef) {
-    // println!("client_ip: {:?}", client_ip.get_ref());
-
-    let ip = "/* addr.ip().to_string() */";
+fn on_connect(socket: SocketRef, client_ip: HttpExtension<ConnectInfo<SocketAddr>>) {
+    let ip = client_ip.ip();
+    let port = client_ip.port();
     let _socket_id = socket.id;
 
-    println!("Connected: {ip}");
+    println!("Connected: {ip}:{port}");
     socket.on_disconnect(move || {
-        println!("Disconnected: {ip}");
+        println!("Disconnected: {ip}:{port}");
     });
 }

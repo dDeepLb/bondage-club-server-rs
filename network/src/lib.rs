@@ -1,4 +1,5 @@
-use axum::{Router, extract::ConnectInfo, routing::get};
+use axum::{extract::ConnectInfo, routing::get, Router};
+use axum_client_ip::ClientIpSource;
 use socketioxide::SocketIo;
 use std::{net::SocketAddr, time::Duration};
 use tower_http::cors::{Any, CorsLayer};
@@ -20,13 +21,14 @@ pub fn init_socket_io() -> (Router, SocketIo) {
         .build_layer();
 
     let router = Router::new()
-        .layer(layer) 
+        .route("/", get(handler))
+        .layer(layer)
         .layer(CorsLayer::new()
             .allow_origin(Any)
             .allow_methods(Any)
             .allow_headers(Any)
         )
-        .route("/", get(handler));
+        .layer(ClientIpSource::ConnectInfo.into_extension());
 
     (router, io)
 }
