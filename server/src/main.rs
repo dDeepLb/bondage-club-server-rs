@@ -7,7 +7,6 @@ use axum::{
 use tracing::info;
 
 use common::config;
-use network;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -31,7 +30,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let addr = config.server_addr;
     let listener = tokio::net::TcpListener::bind(addr.clone()).await.unwrap();
-    info!("listening on {}", addr);
+    info!("listening on {addr}");
     serve(listener, app).await?;
 
     Ok(())

@@ -1,5 +1,5 @@
 use mongodb::{Client, Collection, Database, options::ClientOptions, bson::{doc, Document}};
-use std::{error::Error, sync::Arc};
+use std::sync::Arc;
 use tokio::sync::RwLock;
 use futures_util::stream::StreamExt;
 
@@ -14,7 +14,7 @@ pub async fn setup_mongodb(uri: &str, db_name: &str, collection_name: &str) -> A
     let db = client.database(db_name);
 
     println!("****************************************");
-    println!("Database: {} connected", db_name);
+    println!("Database: {db_name} connected");
     println!("****************************************");
 
     // Find the highest MemberNumber
@@ -29,15 +29,15 @@ pub async fn setup_mongodb(uri: &str, db_name: &str, collection_name: &str) -> A
     let mut next_member_number = 1;
 
     if let Some(Ok(doc)) = cursor.next().await {
-        if let Some(member_num) = doc.get_i32("MemberNumber").ok() {
+        if let Ok(member_num) = doc.get_i32("MemberNumber") {
             next_member_number = (member_num + 1) as u32;
         }
     }
 
-    println!("Next Member Number: {}", next_member_number);
+    println!("Next Member Number: {next_member_number}");
 
-    Ok::<Arc<State>, Box<dyn Error>>(Arc::new(State {
+    Arc::new(State {
         db,
         next_member_number: RwLock::new(next_member_number),
-    })).expect("Failed to create state")
+    })
 }

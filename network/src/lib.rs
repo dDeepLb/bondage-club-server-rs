@@ -7,7 +7,7 @@ pub mod handlers;
 
 async fn handler(ConnectInfo(addr): ConnectInfo<SocketAddr>) -> String {
     let ip = addr.ip();
-    println!("IP: {}", ip);
+    println!("IP: {ip}");
     addr.to_string()
 }
 
@@ -28,5 +28,5 @@ pub fn init_socket_io() -> (Router, SocketIo) {
         )
         .route("/", get(handler));
 
-    return (router, io);
+    (router, io)
 }

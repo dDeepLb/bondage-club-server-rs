@@ -18,14 +18,14 @@ pub fn register(io: &SocketIo, _state: Arc<State>) {
     // socket.on("PasswordResetProcess", function(data) { PasswordResetProcess(data, socket); });
 }
 
-fn on_connect(socket: SocketRef) -> () {
+fn on_connect(socket: SocketRef) {
     // println!("client_ip: {:?}", client_ip.get_ref());
 
     let ip = "/* addr.ip().to_string() */";
     let _socket_id = socket.id;
 
-    println!("Connected: {}", ip);
+    println!("Connected: {ip}");
     socket.on_disconnect(move || {
-        println!("Disconnected: {}", ip);
+        println!("Disconnected: {ip}");
     });
 }
