@@ -13,9 +13,17 @@ pub async fn setup_mongodb(uri: &str, db_name: &str, collection_name: &str) -> A
     let client = Client::with_options(options).unwrap();
     let db = client.database(db_name);
 
-    println!("****************************************");
-    println!("Database: {db_name} connected");
-    println!("****************************************");
+    match db.run_command(doc! { "ping": 1 }, None).await {
+        Ok(_) => {
+            println!("****************************************");
+            println!("Database: {db_name} connected");
+            println!("****************************************");
+        }
+        Err(e) => {
+            eprintln!("❌ Failed to ping MongoDB: {e}");
+            panic!("Cannot continue without database connection");
+        }
+    }
 
     // Find the highest MemberNumber
     let collection: Collection<Document> = db.collection(collection_name);
