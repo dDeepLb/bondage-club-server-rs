@@ -6,12 +6,14 @@ use axum::{
 };
 use tracing::info;
 
-use common::config;
+mod common;
+mod db;
+mod network;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // load .env, config, logging, etc.
-    let config = config::load_config();
+    let config = common::config::load_config();
     tracing_subscriber::fmt().init();
 
     let db_uri: &str = &config.db_uri;

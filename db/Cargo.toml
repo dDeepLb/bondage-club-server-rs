@@ -1,9 +1,0 @@
-[package]
-name = "db"
-version = "0.1.0"
-edition = "2024"
-
-[dependencies]
-futures-util = "0.3.31"
-mongodb = { version = "2.8", features = ["tokio-runtime"] }
-tokio = { version = "1", features = ["full"] }

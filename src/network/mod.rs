@@ -7,9 +7,7 @@ use tower_http::cors::{Any, CorsLayer};
 pub mod handlers;
 
 async fn handler(ConnectInfo(addr): ConnectInfo<SocketAddr>) -> String {
-    let ip = addr.ip();
-    println!("IP: {ip}");
-    addr.to_string()
+    addr.ip().to_string()
 }
 
 pub fn init_socket_io() -> (Router, SocketIo) {
@@ -23,12 +21,12 @@ pub fn init_socket_io() -> (Router, SocketIo) {
     let router = Router::new()
         .route("/", get(handler))
         .layer(layer)
+        .layer(ClientIpSource::ConnectInfo.into_extension())
         .layer(CorsLayer::new()
             .allow_origin(Any)
             .allow_methods(Any)
             .allow_headers(Any)
-        )
-        .layer(ClientIpSource::ConnectInfo.into_extension());
+        );
 
     (router, io)
 }

@@ -260,6 +260,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "bondage-club-server-rs"
+version = "0.1.0"
+dependencies = [
+ "axum 0.7.9",
+ "axum-client-ip",
+ "dotenvy",
+ "figment",
+ "futures-util",
+ "mongodb",
+ "serde",
+ "socketioxide",
+ "tokio",
+ "tower-http",
+ "tracing",
+ "tracing-subscriber",
+]
+
+[[package]]
 name = "bson"
 version = "2.15.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -340,15 +358,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "common"
-version = "0.1.0"
-dependencies = [
- "dotenvy",
- "figment",
- "serde",
-]
-
-[[package]]
 name = "convert_case"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -419,15 +428,6 @@ name = "data-encoding"
 version = "2.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2a2330da5de22e8a3cb63252ce2abb30116bf5265e89c0e01bc17015ce30a476"
-
-[[package]]
-name = "db"
-version = "0.1.0"
-dependencies = [
- "futures-util",
- "mongodb",
- "tokio",
-]
 
 [[package]]
 name = "deranged"
@@ -1181,17 +1181,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "network"
-version = "0.1.0"
-dependencies = [
- "axum 0.7.9",
- "axum-client-ip",
- "db",
- "socketioxide",
- "tower-http",
-]
-
-[[package]]
 name = "nu-ansi-term"
 version = "0.46.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1663,21 +1652,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 1.0.109",
-]
-
-[[package]]
-name = "server"
-version = "0.1.0"
-dependencies = [
- "axum 0.7.9",
- "common",
- "db",
- "network",
- "socketioxide",
- "tokio",
- "tower-http",
- "tracing",
- "tracing-subscriber",
 ]
 
 [[package]]

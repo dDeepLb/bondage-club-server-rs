@@ -1,14 +1,16 @@
 use axum::extract::ConnectInfo;
-use db::State;
 use socketioxide::{
     extract::{HttpExtension, SocketRef}, SocketIo
 };
 use std::{net::SocketAddr, sync::Arc};
 
+use crate::db::State;
+
 pub fn register(io: &SocketIo, _state: Arc<State>) {
     io.ns(
         "/",
         |socket: SocketRef, client_ip: HttpExtension<ConnectInfo<SocketAddr>>| {
+            println!("Connected: {}", socket.id);
             on_connect(socket, client_ip);
         },
     )
@@ -27,4 +29,5 @@ fn on_connect(socket: SocketRef, client_ip: HttpExtension<ConnectInfo<SocketAddr
     socket.on_disconnect(move || {
         println!("Disconnected: {ip}:{port}");
     });
+    let _ = socket.emit("message", "Welcum to Bondage Club!");
 }

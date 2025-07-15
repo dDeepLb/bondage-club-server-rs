@@ -3,7 +3,7 @@ use figment::{
     Figment,
 };
 use dotenvy::dotenv;
-use crate::config::types::AppConfig;
+use types::AppConfig;
 
 mod types;
 

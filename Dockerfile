@@ -1,14 +1,11 @@
 ARG RUST_VERSION=1.88.0
-ARG APP_NAME=server
+ARG APP_NAME=bondage-club-server-rs
 FROM rust:${RUST_VERSION}-slim-bullseye AS build
 ARG APP_NAME
 WORKDIR /app
 
 RUN \
-    --mount=type=bind,source=common,target=common \
-    --mount=type=bind,source=db,target=db \
-    --mount=type=bind,source=network,target=network \
-    --mount=type=bind,source=server,target=server \
+    --mount=type=bind,source=src,target=src \
     --mount=type=bind,source=Cargo.toml,target=Cargo.toml \
     --mount=type=bind,source=Cargo.lock,target=Cargo.lock \
     --mount=type=cache,target=/app/target/ \
