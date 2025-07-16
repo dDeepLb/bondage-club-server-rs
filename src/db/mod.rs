@@ -1,12 +1,13 @@
-use mongodb::{Client, Collection, Database, options::ClientOptions, bson::{doc, Document}};
+use futures_util::stream::StreamExt;
+use mongodb::{
+    Client, Collection,
+    bson::{Document, doc},
+    options::ClientOptions,
+};
 use std::sync::Arc;
 use tokio::sync::RwLock;
-use futures_util::stream::StreamExt;
 
-pub struct State {
-    pub db: Database,
-    pub next_member_number: RwLock<u32>,
-}
+use crate::common::config::types::{Account, AccountCreationIP, State};
 
 pub async fn setup_mongodb(uri: &str, db_name: &str, collection_name: &str) -> Arc<State> {
     let options = ClientOptions::parse(uri).await.unwrap();
@@ -47,5 +48,7 @@ pub async fn setup_mongodb(uri: &str, db_name: &str, collection_name: &str) -> A
     Arc::new(State {
         db,
         next_member_number: RwLock::new(next_member_number),
+        account_creation_ip: RwLock::new(<Vec<AccountCreationIP>>::new()),
+        accounts: RwLock::new(<Vec<Account>>::new()),
     })
 }

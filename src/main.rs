@@ -1,9 +1,6 @@
 use std::net::SocketAddr;
 
-use axum::{
-    Router,
-    serve,
-};
+use axum::{Router, serve};
 use tracing::info;
 
 mod common;
@@ -37,4 +34,3 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     Ok(())
 }
-
