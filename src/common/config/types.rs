@@ -1,10 +1,12 @@
-use std::{net::IpAddr, time::SystemTime};
+use std::{collections::HashMap, net::IpAddr, time::SystemTime};
 
 use mongodb::Database;
 use ordermap::{OrderMap, OrderSet};
 use serde::{self, Deserialize, Serialize};
 use socketioxide::{extract::SocketRef, socket::Sid};
 use tokio::sync::RwLock;
+
+use crate::common::types::{ChatRoom, ServerChatRoomSettings};
 
 #[derive(Debug, Deserialize)]
 pub struct AppConfig {
@@ -29,7 +31,7 @@ struct Lovership {
     BeginWeddingOfferedByMemberNumber?: number;
 }
 */
-#[derive(Debug, Deserialize, Serialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone, PartialEq)]
 #[serde(rename_all = "PascalCase")]
 pub struct Account {
     #[serde(rename = "ID")]
@@ -76,4 +78,5 @@ pub struct State {
     pub accounts: RwLock<Vec<Account>>,
     pub login_queue: RwLock<OrderMap<Sid, LoginQueueStruct>>,
     pub pending_logins: RwLock<OrderSet<Sid>>,
+    pub chat_rooms: RwLock<HashMap::<String, ChatRoom>>,
 }

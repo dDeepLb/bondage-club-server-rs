@@ -1,4 +1,6 @@
 use std::time::{SystemTime, UNIX_EPOCH};
+use rand::RngCore;
+use base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine};
 
 use crate::common::config::SERVER_ACCOUNT_EMAIL_REGEX;
 
@@ -29,4 +31,10 @@ impl Utils for SystemTime {
             .map(|d| d.as_millis())
             .unwrap_or(0) as i64
     }
+}
+
+pub fn generate_base64_id() -> String {
+    let mut bytes = [0u8; 12]; // 12 random bytes
+    rand::rng().fill_bytes(&mut bytes);
+    URL_SAFE_NO_PAD.encode(&bytes)
 }
