@@ -22,3 +22,8 @@ pub static SERVER_ACCOUNT_PASSWORD_REGEX: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"^[a-zA-Z0-9]{1,20}$").unwrap());
 pub static SERVER_ACCOUNT_EMAIL_REGEX: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"^[a-zA-Z0-9@.!#$%&'*+/=?^_`{|}~-]{5,100}$").unwrap());
+pub static SERVER_CHAT_ROOM_NAME_REGEX: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"^[\x20-\x7E]{1,20}$").unwrap());
+
+pub static SERVER_CHAT_ROOM_LIMIT_MIN: u8 = 2;
+pub static SERVER_CHAT_ROOM_LIMIT_MAX: u8 = 20;

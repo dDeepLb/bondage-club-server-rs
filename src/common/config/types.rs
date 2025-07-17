@@ -1,8 +1,10 @@
-use std::{net::IpAddr, time::SystemTime};
+use std::{collections::HashMap, net::IpAddr, time::SystemTime};
 
 use mongodb::Database;
 use serde::{self, Deserialize, Serialize};
 use tokio::sync::RwLock;
+
+use crate::common::types::ServerChatRoomData;
 
 #[derive(Debug, Deserialize)]
 pub struct AppConfig {
@@ -52,4 +54,5 @@ pub struct State {
     pub next_member_number: RwLock<u32>,
     pub account_creation_ip: RwLock<Vec<AccountCreationIP>>,
     pub accounts: RwLock<Vec<Account>>,
+    pub chat_rooms: RwLock<HashMap::<String, ServerChatRoomData>>,
 }

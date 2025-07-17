@@ -4,10 +4,10 @@ use mongodb::{
     bson::{Document, doc},
     options::ClientOptions,
 };
-use std::sync::Arc;
+use std::{collections::HashMap, sync::Arc};
 use tokio::sync::RwLock;
 
-use crate::common::config::types::{Account, AccountCreationIP, State};
+use crate::common::{config::types::{Account, AccountCreationIP, State}, types::ServerChatRoomData};
 
 pub async fn setup_mongodb(uri: &str, db_name: &str, collection_name: &str) -> Arc<State> {
     let options = ClientOptions::parse(uri).await.unwrap();
@@ -50,5 +50,6 @@ pub async fn setup_mongodb(uri: &str, db_name: &str, collection_name: &str) -> A
         next_member_number: RwLock::new(next_member_number),
         account_creation_ip: RwLock::new(<Vec<AccountCreationIP>>::new()),
         accounts: RwLock::new(<Vec<Account>>::new()),
+        chat_rooms: RwLock::new(HashMap::<String, ServerChatRoomData>::new()),
     })
 }
