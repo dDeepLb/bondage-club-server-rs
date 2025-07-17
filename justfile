@@ -20,12 +20,12 @@ reset:
 
 # Remove all the containers and the mongo database
 reset-hard:
-	docker-compose down --volumes
+  docker-compose down --volumes
 
 # View the logs from the bondage club server
 logs-app:
-	docker-compose logs app
+  docker-compose logs app
 
 # View the logs of Mongo
 logs-db:
-	docker-compose logs db
+  docker-compose logs db
