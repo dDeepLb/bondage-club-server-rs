@@ -76,9 +76,9 @@ async fn check_creation_ratelimits(
     true
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug, Clone)]
 #[serde(rename_all = "PascalCase")]
-struct AccountCreateRequest {
+pub struct AccountCreateRequest {
     account_name: String,
     password: String,
     name: String,
@@ -86,7 +86,7 @@ struct AccountCreateRequest {
 }
 
 pub async fn on_account_create(
-    Data(data): Data<Value>,
+    Data(data): Data<AccountCreateRequest>,
     socket: SocketRef,
     state: Arc<State>,
     client_ip: HttpExtension<ConnectInfo<SocketAddr>>,
@@ -97,7 +97,7 @@ pub async fn on_account_create(
     let parsed = match serde_json::from_value::<AccountCreateRequest>(data) {
         Ok(p) => p,
         Err(err) => {
-            println!("AccountCreate: Invalid payload: {err} | Raw: {data_clone}");
+            println!("AccountCreate: Invalid payload: {err} | Raw: {:?data_clone}");
             let _ = socket.emit("CreationResponse", "Invalid request data");
             return;
         }
