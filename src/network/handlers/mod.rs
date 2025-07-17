@@ -1,4 +1,6 @@
 mod account;
+mod chatroom;
+
 use axum::extract::ConnectInfo;
 use socketioxide::{
     SocketIo,
@@ -11,7 +13,8 @@ use crate::{common::config::types::State, network::handlers::account::on_account
 pub fn register(io: &SocketIo, state: Arc<State>) {
     io.ns(
         "/",
-        |socket: SocketRef, client_ip: HttpExtension<ConnectInfo<SocketAddr>>| {
+        async |socket: SocketRef, client_ip: HttpExtension<ConnectInfo<SocketAddr>>| {
+          let state = state;
             println!("Connected: {}", socket.id);
             on_connect(socket, client_ip, state);
         },
