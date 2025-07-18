@@ -133,8 +133,7 @@ pub async fn on_account_create(
             creation: SystemTime::now().get_timestamp_in_milliseconds(),
             last_login: SystemTime::now().get_timestamp_in_milliseconds(),
             environment: "PROD".to_string(), //account_get_environment(socket),
-            id: None,
-            socket: None,
+            ..Default::default()
         };
         match users.insert_one(&account, None).await {
             Ok(_) => {

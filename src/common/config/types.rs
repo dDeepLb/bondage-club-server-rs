@@ -3,6 +3,7 @@ use std::{net::IpAddr, time::SystemTime};
 use mongodb::Database;
 use ordermap::{OrderMap, OrderSet};
 use serde::{self, Deserialize, Serialize};
+use serde_json::Value;
 use socketioxide::{extract::SocketRef, socket::Sid};
 use tokio::sync::RwLock;
 
@@ -29,7 +30,7 @@ struct Lovership {
     BeginWeddingOfferedByMemberNumber?: number;
 }
 */
-#[derive(Debug, Deserialize, Serialize, Clone)]
+#[derive(Debug, Deserialize, Serialize, Clone, Default)]
 #[serde(rename_all = "PascalCase")]
 pub struct Account {
     #[serde(rename = "ID")]
@@ -50,11 +51,30 @@ pub struct Account {
     pub environment: String, // "PROD" | "DEV" | string;
     #[serde(skip)]
     pub socket: Option<SocketRef>,
-    //ChatRoom: Option<Chatroom>,
-    //Ownership: Option<ServerOwnership>,
-    //DelayedAppearanceUpdate: Option<ServerAccountData["Appearance"]>,
-    // DelayedSkillUpdate: Option<ServerAccountData["Skill"]>,
-    // DelayedGameUpdate: Option<ServerChatRoomGame>,
+    pub chat_room: Option<Value>,
+    pub ownership: Option<Value>,
+    pub delayed_appearance_update: Option<Value>,
+    pub delayed_skill_update: Option<Value>,
+    pub delayed_game_update: Option<Value>,
+    pub inventory_data: Option<Value>,
+    pub arousal_settings: Option<Value>,
+    pub online_shared_settings: Option<Value>,
+    pub game: Option<Value>,
+    pub map_data: Option<Value>,
+    pub label_color: Option<Value>,
+    pub appearance: Option<Value>,
+    pub reputation: Option<Vec<String>>,
+    pub description: Option<String>,
+    pub block_items: Option<Value>,
+    pub limited_items: Option<Value>,
+    pub favorite_items: Option<Value>,
+    pub lovership: Option<Vec<Value>>,
+    pub lover: Option<String>,
+    pub skill: Option<Value>,
+    pub title: Option<String>,
+    pub nickname: Option<Value>,
+    pub crafting: Option<Value>,
+    pub log: Option<Vec<Value>>,
 }
 
 #[derive(Debug, PartialEq, Eq)]
