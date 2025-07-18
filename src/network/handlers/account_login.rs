@@ -1,11 +1,14 @@
 use std::{sync::Arc, time::SystemTime};
 
-use crate::common::{
-    config::{
-        self, SERVER_ACCOUNT_NAME_REGEX, SERVER_ACCOUNT_PASSWORD_REGEX,
-        types::{Account, LoginQueueStruct, State},
+use crate::{
+    common::{
+        config::{
+            self, SERVER_ACCOUNT_NAME_REGEX, SERVER_ACCOUNT_PASSWORD_REGEX,
+            types::{Account, LoginQueueStruct, State},
+        },
+        utility::Utils,
     },
-    utility::Utils,
+    network::handlers::send_server_info::account_send_server_info,
 };
 use async_recursion::async_recursion;
 use mongodb::bson::{Bson, doc};
@@ -213,9 +216,8 @@ async fn account_login_process(
        OnLogin(socket);
        delete result.Password;
        delete result.Email;
-       socket.compress(false).emit("LoginResponse", result);
        result.Socket = socket;
-       AccountSendServerInfo(socket);
        AccountPurgeInfo(result);
     */
+    account_send_server_info(socket, state).await;
 }
