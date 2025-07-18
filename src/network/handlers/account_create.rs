@@ -4,77 +4,22 @@ use std::{
     time::{Duration, SystemTime},
 };
 
-use crate::common::{
-    config::{
-        self, SERVER_ACCOUNT_NAME_REGEX, SERVER_ACCOUNT_PASSWORD_REGEX,
-        SERVER_CHARACTER_NAME_REGEX,
-        types::{Account, AccountCreationIP, AppConfig, State},
+use crate::{
+    common::{
+        config::{
+            self, SERVER_ACCOUNT_NAME_REGEX, SERVER_ACCOUNT_PASSWORD_REGEX,
+            SERVER_CHARACTER_NAME_REGEX,
+            types::{Account, AccountCreationIP, AppConfig, State},
+        },
+        utility::{Utils, is_valid_mail},
     },
-    utility::{Utils, is_valid_mail},
+    network::handlers::send_server_info::account_send_server_info,
 };
 use axum::extract::ConnectInfo;
 use mongodb::bson::doc;
 use serde::Deserialize;
 use serde_json::{Value, json};
 use socketioxide::extract::{Data, HttpExtension, SocketRef};
-async fn account_send_server_info(socket: SocketRef, state: Arc<State>) {
-    // Sends the info to all players
-
-    let server_info;
-    let read_state = state.clone();
-    {
-        let accounts: tokio::sync::RwLockReadGuard<'_, Vec<Account>> =
-            read_state.accounts.read().await;
-        server_info = json!( {
-            "Time": SystemTime::now().get_timestamp_in_milliseconds(),
-            "OnlinePlayers": accounts.len(),
-        })
-    }
-    //if socket != None {
-    let _ = socket.emit("ServerInfo", &server_info);
-    // } else {
-    //IO.sockets.volatile.emit("ServerInfo", server_info);
-    //}
-}
-
-async fn check_creation_ratelimits(
-    client_ip: HttpExtension<ConnectInfo<SocketAddr>>,
-    state: &Arc<State>,
-    config: &AppConfig,
-) -> bool {
-    let current_ip = client_ip.ip().to_canonical();
-    let current_time = SystemTime::now();
-    let mut total_count: u32 = 0;
-    let mut hour_count: u32 = 0;
-    let one_hour_ago = current_time - Duration::from_secs(3600);
-    // loop
-    {
-        let account_creation_ip = state.account_creation_ip.read().await;
-
-        for ip in account_creation_ip.iter() {
-            if ip.address == current_ip {
-                total_count += 1;
-                if ip.time >= one_hour_ago {
-                    hour_count += 1;
-                }
-            }
-        }
-    }
-    // Exits if we reached the limit
-    if total_count >= config.max_ip_account_per_day || hour_count >= config.max_ip_account_per_hour
-    {
-        return false;
-    }
-    {
-        // Keeps the IP in memory for the next run
-        let mut account_creation_ip = state.account_creation_ip.write().await;
-        account_creation_ip.push(AccountCreationIP {
-            address: current_ip,
-            time: current_time,
-        });
-    }
-    true
-}
 
 #[derive(Deserialize)]
 #[serde(rename_all = "PascalCase")]
@@ -174,7 +119,7 @@ pub async fn on_account_create(
     {
         let mut next_member_number = state.next_member_number.write().await;
         account = Account {
-            account_name,
+            account_name: account_name.to_uppercase(),
             name,
             password: Some(hash),
             email: Some(email.unwrap().to_string()),
@@ -189,6 +134,7 @@ pub async fn on_account_create(
             last_login: SystemTime::now().get_timestamp_in_milliseconds(),
             environment: "PROD".to_string(), //account_get_environment(socket),
             id: None,
+            socket: None,
         };
         match users.insert_one(&account, None).await {
             Ok(_) => {
@@ -201,8 +147,7 @@ pub async fn on_account_create(
         };
     }
     account.id = Some(socket.id.to_string());
-
-    //account.Socket = socket;
+    account.socket = Some(socket.clone());
     //AccountValidData(account);
     //Account.push(account);
     //OnLogin(socket);
@@ -211,10 +156,48 @@ pub async fn on_account_create(
         "CreationResponse",
         &json!({
             "ServerAnswer": "AccountCreated",
-            "OnlineID": account.account_name,
+            "OnlineID": account.account_name.to_uppercase(),
             "MemberNumber": account.member_number,
         }),
     );
     account_send_server_info(socket, state).await;
     //AccountPurgeInfo(data);
+}
+async fn check_creation_ratelimits(
+    client_ip: HttpExtension<ConnectInfo<SocketAddr>>,
+    state: &Arc<State>,
+    config: &AppConfig,
+) -> bool {
+    let current_ip = client_ip.ip().to_canonical();
+    let current_time = SystemTime::now();
+    let mut total_count: u32 = 0;
+    let mut hour_count: u32 = 0;
+    let one_hour_ago = current_time - Duration::from_secs(3600);
+    // loop
+    {
+        let account_creation_ip = state.account_creation_ip.read().await;
+
+        for ip in account_creation_ip.iter() {
+            if ip.address == current_ip {
+                total_count += 1;
+                if ip.time >= one_hour_ago {
+                    hour_count += 1;
+                }
+            }
+        }
+    }
+    // Exits if we reached the limit
+    if total_count >= config.max_ip_account_per_day || hour_count >= config.max_ip_account_per_hour
+    {
+        return false;
+    }
+    {
+        // Keeps the IP in memory for the next run
+        let mut account_creation_ip = state.account_creation_ip.write().await;
+        account_creation_ip.push(AccountCreationIP {
+            address: current_ip,
+            time: current_time,
+        });
+    }
+    true
 }
