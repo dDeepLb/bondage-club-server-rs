@@ -4,6 +4,7 @@ use mongodb::{
     bson::{Document, doc},
     options::ClientOptions,
 };
+use ordermap::{OrderMap, OrderSet};
 use std::sync::Arc;
 use tokio::sync::RwLock;
 
@@ -50,5 +51,7 @@ pub async fn setup_mongodb(uri: &str, db_name: &str, collection_name: &str) -> A
         next_member_number: RwLock::new(next_member_number),
         account_creation_ip: RwLock::new(<Vec<AccountCreationIP>>::new()),
         accounts: RwLock::new(<Vec<Account>>::new()),
+        login_queue: RwLock::new(OrderMap::new()),
+        pending_logins: RwLock::new(OrderSet::new()),
     })
 }

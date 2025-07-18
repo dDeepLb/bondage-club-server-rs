@@ -19,14 +19,14 @@ pub fn is_valid_mail(mail: &str) -> bool {
 }
 
 pub trait Utils {
-    fn get_timestamp_in_milliseconds(&self) -> u128;
+    fn get_timestamp_in_milliseconds(&self) -> i64;
 }
 
 impl Utils for SystemTime {
-    fn get_timestamp_in_milliseconds(&self) -> u128 {
+    fn get_timestamp_in_milliseconds(&self) -> i64 {
         SystemTime::now()
             .duration_since(UNIX_EPOCH)
             .map(|d| d.as_millis())
-            .unwrap_or(0)
+            .unwrap_or(0) as i64
     }
 }
