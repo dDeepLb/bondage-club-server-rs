@@ -1,4 +1,4 @@
-use std::{net::IpAddr, time::SystemTime};
+use std::{collections::HashSet, net::IpAddr, time::SystemTime};
 
 use mongodb::Database;
 use ordermap::{OrderMap, OrderSet};
@@ -30,6 +30,15 @@ struct Lovership {
     BeginWeddingOfferedByMemberNumber?: number;
 }
 */
+#[derive(Debug, Deserialize, Serialize, Clone)]
+#[serde(rename_all = "PascalCase")]
+pub struct Ownership {
+    pub name: String,
+    pub member_number: u32,
+    pub stage: u8,
+    pub start: i64,
+}
+
 #[derive(Debug, Deserialize, Serialize, Clone, Default)]
 #[serde(rename_all = "PascalCase")]
 pub struct Account {
@@ -42,9 +51,9 @@ pub struct Account {
     pub member_number: u32,
     //pub lovership: Vec<Lovership>,
     pub item_permission: u8,
-    pub friend_list: Vec<String>,
-    pub white_list: Vec<String>,
-    pub black_list: Vec<String>,
+    pub friend_list: HashSet<u32>,
+    pub white_list: HashSet<u32>,
+    pub black_list: HashSet<u32>,
     pub money: u32,
     pub creation: i64,
     pub last_login: i64,
@@ -52,7 +61,7 @@ pub struct Account {
     #[serde(skip)]
     pub socket: Option<SocketRef>,
     pub chat_room: Option<Value>,
-    pub ownership: Option<Value>,
+    pub ownership: Option<Ownership>,
     pub delayed_appearance_update: Option<Value>,
     pub delayed_skill_update: Option<Value>,
     pub delayed_game_update: Option<Value>,
@@ -96,4 +105,16 @@ pub struct State {
     pub accounts: RwLock<Vec<Account>>,
     pub login_queue: RwLock<OrderMap<Sid, LoginQueueStruct>>,
     pub pending_logins: RwLock<OrderSet<Sid>>,
+}
+
+#[derive(Deserialize, Serialize)]
+#[serde(rename_all = "PascalCase")]
+pub struct ServerFriendInfo {
+    pub r#type: &'static str, // "type" is a reserved keyword
+    pub member_number: u32,
+    pub member_name: String,
+    // todo: Chatroom
+    /*  chat_room_space: Option<String>,
+    chat_room_name: Option<String>,
+    private: Option<bool>, */
 }

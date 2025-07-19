@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::{collections::HashSet, sync::Arc};
 
 use mongodb::bson::{self, Bson, Document, doc};
 use serde::{Deserialize, Serialize};
@@ -14,9 +14,9 @@ use crate::common::config::{self, types::State};
 struct AccountUpdateRequest {
     pub name: Option<String>,
     pub item_permission: Option<u8>,
-    pub friend_list: Option<Vec<String>>,
-    pub white_list: Option<Vec<String>>,
-    pub black_list: Option<Vec<String>>,
+    pub friend_list: Option<HashSet<u32>>,
+    pub white_list: Option<HashSet<u32>>,
+    pub black_list: Option<HashSet<u32>>,
     pub creation: Option<i64>,
     pub last_login: Option<i64>,
     pub chat_room: Option<Value>,
@@ -128,7 +128,7 @@ pub async fn account_update(Data(data): Data<Value>, socket: SocketRef, state: A
         }
         if let Some(white_list) = parsed.white_list {
             update.insert("WhiteList", bson::to_bson(&white_list).unwrap());
-            account.white_list = white_list;
+            account.white_list = white_list
         }
         if let Some(black_list) = parsed.black_list {
             update.insert("BlackList", bson::to_bson(&black_list).unwrap());
