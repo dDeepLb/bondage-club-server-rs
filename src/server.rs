@@ -32,6 +32,7 @@ pub struct BCServer {
     pub account_creation_ip: RwLock<Vec<AccountCreationIP>>,
     pub login_queue: RwLock<OrderMap<Sid, LoginQueueStruct>>,
     pub pending_logins: RwLock<OrderSet<Sid>>,
+    pub io: SocketIo,
 }
 
 #[derive(Debug, Deserialize)]
@@ -53,7 +54,7 @@ pub fn load_config() -> AppConfig {
 }
 
 impl BCServer {
-    pub async fn new(db: Database) -> Arc<Self> {
+    pub async fn new(db: Database, io: SocketIo) -> Arc<Self> {
         let config = load_config();
         match db.run_command(doc! { "ping": 1 }, None).await {
             Ok(_) => {
@@ -94,10 +95,12 @@ impl BCServer {
             account_creation_ip: RwLock::new(<Vec<AccountCreationIP>>::new()),
             login_queue: RwLock::new(OrderMap::new()),
             pending_logins: RwLock::new(OrderSet::new()),
+            io,
         })
     }
 
-    pub fn register_handlers(self: Arc<Self>, io: &SocketIo) {
+    pub fn register_handlers(self: Arc<Self>) {
+        let io = self.io.clone();
         io.ns(
             "/",
             move |socket: SocketRef, client_ip: HttpExtension<ConnectInfo<SocketAddr>>| {
