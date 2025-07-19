@@ -7,11 +7,9 @@ use std::{
 use crate::{
     common::{
         config::{
-            self, SERVER_ACCOUNT_NAME_REGEX, SERVER_ACCOUNT_PASSWORD_REGEX,
-            SERVER_CHARACTER_NAME_REGEX,
-            types::{Account, AccountCreationIP, AppConfig, State},
+            self, types::{Account, AccountCreationIP, AppConfig, State}, SERVER_ACCOUNT_NAME_REGEX, SERVER_ACCOUNT_PASSWORD_REGEX, SERVER_CHARACTER_NAME_REGEX
         },
-        utility::{Utils, is_valid_mail},
+        utility::{attach_account_to_socket, is_valid_mail, Utils},
     },
     network::handlers::send_server_info::account_send_server_info,
 };
@@ -149,6 +147,7 @@ pub async fn on_account_create(
     account.socket = Some(socket.clone());
     //AccountValidData(account);
     //Account.push(account);
+    attach_account_to_socket(&socket, account.clone()).await;
     //OnLogin(socket);
 
     let _ = socket.emit(

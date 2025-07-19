@@ -6,7 +6,7 @@ use serde_json::Value;
 use socketioxide::extract::{Data, SocketRef};
 use utility_types::Partial;
 
-use crate::common::config::{self, types::State};
+use crate::common::{config::{self, types::State}, utility::get_account_from_socket};
 
 #[derive(Deserialize, Serialize, Partial)]
 #[partial(ident = Account, derive(Debug, PartialEq), forward_attrs())]
@@ -60,14 +60,7 @@ pub async fn account_update(Data(data): Data<Value>, socket: SocketRef, state: A
     {
         let mut update: Document = doc! {};
 
-        let mut accounts = state.accounts.write().await;
-        let account = accounts
-            .iter_mut()
-            .find(|a| a.id == Some(socket.id.to_string()));
-        if account.is_none() {
-            return;
-        }
-        let account = account.unwrap();
+        let mut account = get_account_from_socket(&socket).unwrap();
         if let Some(log) = parsed.log.clone() {
             update.insert("Log", bson::to_bson(&log).unwrap());
             account.log = Some(log);

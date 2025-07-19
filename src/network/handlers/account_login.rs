@@ -3,10 +3,9 @@ use std::{sync::Arc, time::SystemTime};
 use crate::{
     common::{
         config::{
-            self, SERVER_ACCOUNT_NAME_REGEX, SERVER_ACCOUNT_PASSWORD_REGEX,
-            types::{Account, LoginQueueStruct, State},
+            self, types::{Account, LoginQueueStruct, State}, SERVER_ACCOUNT_NAME_REGEX, SERVER_ACCOUNT_PASSWORD_REGEX
         },
-        utility::Utils,
+        utility::{attach_account_to_socket, get_account_from_socket, Utils},
     },
     network::handlers::send_server_info::account_send_server_info,
 };
@@ -174,18 +173,11 @@ async fn account_login_process(
     // Disconnect duplicated logged accounts
     // FIXME: literally don't know, built on hopes
     {
-        let mut accounts = state.accounts.write().await;
-        for (index, account) in accounts.iter().enumerate() {
-            if account.account_name == account_result.account_name {
-                if account.socket.is_none() {
-                    continue;
-                }
-                let socket = account.socket.as_ref().unwrap();
-                let _ = socket.emit("ForceDisconnect", "ErrorDuplicatedLogin");
-                let _ = <socketioxide::extract::SocketRef as Clone>::clone(socket).disconnect();
-                accounts.remove(index);
-                break;
-            }
+        let account = get_account_from_socket(&socket).unwrap();
+        if account.account_name == account_result.account_name {
+            let socket = account.socket.as_ref().unwrap();
+            let _ = socket.emit("ForceDisconnect", "ErrorDuplicatedLogin");
+            let _ = <socketioxide::extract::SocketRef as Clone>::clone(socket).disconnect();
         }
     }
 
@@ -205,8 +197,7 @@ async fn account_login_process(
     // AccountValidData(account_result)
     // AccountRemoveFromChatRoom(account_result.MemberNumber);
     {
-        let mut accounts = state.accounts.write().await;
-        accounts.push(account_result.clone());
+        attach_account_to_socket(&socket, account_result.clone());
     }
     //OnLogin(socket);
     let _ = socket.emit("LoginResponse", &account_result);

@@ -28,3 +28,6 @@ utility-types = "0.0.4"
 
 [dev-dependencies]
 just = "1.42.2"
+
+[package.metadata.clippy]
+let_underscore_drop = false

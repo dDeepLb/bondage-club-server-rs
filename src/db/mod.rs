@@ -50,7 +50,6 @@ pub async fn setup_mongodb(uri: &str, db_name: &str, collection_name: &str) -> A
         db,
         next_member_number: RwLock::new(next_member_number),
         account_creation_ip: RwLock::new(<Vec<AccountCreationIP>>::new()),
-        accounts: RwLock::new(<Vec<Account>>::new()),
         login_queue: RwLock::new(OrderMap::new()),
         pending_logins: RwLock::new(OrderSet::new()),
     })

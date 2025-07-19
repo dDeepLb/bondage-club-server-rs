@@ -1,3 +1,4 @@
+#![allow(clippy::let_underscore_drop)] 
 use std::time::{SystemTime, UNIX_EPOCH};
 use std::sync::Arc;
 
@@ -34,10 +35,12 @@ impl Utils for SystemTime {
     }
 }
 
-async fn attach_account_to_socket(socket: SocketRef, account: &mut Arc<Account>) {
-    socket.req_parts().extensions.get_mut::<Arc<Account>>().insert(account);
+pub async fn attach_account_to_socket(socket: &SocketRef, account: Account) {
+    let mut parts = socket.req_parts().clone();
+    let mut_account = &mut Arc::new(account);
+    parts.extensions.get_mut::<Arc<Account>>().insert(mut_account);
 }
 
-fn get_account_from_socket(socket: &SocketRef) -> Option<Arc<Account>> {
+pub fn get_account_from_socket(socket: &SocketRef) -> Option<Arc<Account>> {
     socket.req_parts().extensions.get::<Arc<Account>>().cloned()
 }

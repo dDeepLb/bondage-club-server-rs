@@ -93,7 +93,6 @@ pub struct State {
     pub db: Database,
     pub next_member_number: RwLock<u32>,
     pub account_creation_ip: RwLock<Vec<AccountCreationIP>>,
-    pub accounts: RwLock<Vec<Account>>,
     pub login_queue: RwLock<OrderMap<Sid, LoginQueueStruct>>,
     pub pending_logins: RwLock<OrderSet<Sid>>,
 }
