@@ -52,14 +52,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let client = Client::with_options(options).unwrap();
     let db = client.database(db_name);
 
-    let server = BCServer::new(db).await;
-
-    // initialize Socket.IO
     let (socket_router, io) = init_socket_io();
 
-    server.register_handlers(&io);
-
-    // network::handlers::register(&io, state.clone());
+    let _server = BCServer::new(db, io).await;
 
     let app = Router::new()
         .merge(socket_router)
