@@ -1,18 +1,5 @@
-use dotenvy::dotenv;
-use figment::{Figment, providers::Env};
 use regex::Regex;
 use std::sync::LazyLock;
-use types::AppConfig;
-
-pub mod types;
-
-pub fn load_config() -> AppConfig {
-    dotenv().ok();
-
-    Figment::from(Env::prefixed("APP_"))
-        .extract()
-        .expect("Failed to load configuration")
-}
 
 pub static SERVER_ACCOUNT_NAME_REGEX: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"^[a-zA-Z0-9]{1,20}$").unwrap());
