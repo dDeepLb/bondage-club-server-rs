@@ -1,0 +1,2 @@
+# Disable the let_underscore_drop lint globally
+let_underscore_drop = "allow"

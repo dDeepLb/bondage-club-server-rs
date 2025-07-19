@@ -24,6 +24,7 @@ struct AccountLoginRequest {
 
 pub async fn on_account_login(Data(data): Data<Value>, socket: SocketRef, state: Arc<State>) {
     let data_clone = data.clone();
+    let state = state.clone();
     let parsed = match serde_json::from_value::<AccountLoginRequest>(data) {
         Ok(p) => p,
         Err(err) => {
@@ -174,6 +175,7 @@ async fn account_login_process(
     // FIXME: literally don't know, built on hopes
     {
         let account = get_account_from_socket(&socket).unwrap();
+        let account = account.lock().unwrap();
         if account.account_name == account_result.account_name {
             let socket = account.socket.as_ref().unwrap();
             let _ = socket.emit("ForceDisconnect", "ErrorDuplicatedLogin");

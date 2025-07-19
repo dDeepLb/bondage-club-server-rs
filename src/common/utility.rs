@@ -1,6 +1,6 @@
 #![allow(clippy::let_underscore_drop)] 
 use std::time::{SystemTime, UNIX_EPOCH};
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 
 use socketioxide::extract::SocketRef;
 
@@ -41,6 +41,6 @@ pub async fn attach_account_to_socket(socket: &SocketRef, account: Account) {
     parts.extensions.get_mut::<Arc<Account>>().insert(mut_account);
 }
 
-pub fn get_account_from_socket(socket: &SocketRef) -> Option<Arc<Account>> {
-    socket.req_parts().extensions.get::<Arc<Account>>().cloned()
+pub fn get_account_from_socket(socket: &SocketRef) -> Option<Arc<Mutex<Account>>> {
+    socket.req_parts().extensions.get::<Arc<Mutex<Account>>>().cloned()
 }

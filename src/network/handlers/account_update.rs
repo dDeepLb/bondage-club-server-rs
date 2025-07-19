@@ -60,7 +60,8 @@ pub async fn account_update(Data(data): Data<Value>, socket: SocketRef, state: A
     {
         let mut update: Document = doc! {};
 
-        let mut account = get_account_from_socket(&socket).unwrap();
+        let account = get_account_from_socket(&socket).unwrap();
+        let mut account = account.lock().unwrap();
         if let Some(log) = parsed.log.clone() {
             update.insert("Log", bson::to_bson(&log).unwrap());
             account.log = Some(log);

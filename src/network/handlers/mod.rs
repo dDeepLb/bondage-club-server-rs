@@ -55,7 +55,8 @@ fn on_connect(
         on_account_login(data, socket, clone_state).await;
     });
 
+    let clone_state: Arc<State> = state.clone();
     socket.on("AccountUpdate", async |data, socket| {
-        account_update(data, socket, state).await;
+        account_update(data, socket, clone_state).await;
     });
 }

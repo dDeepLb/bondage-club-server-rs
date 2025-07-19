@@ -14,8 +14,7 @@ pub async fn account_send_server_info(socket: SocketRef, state: Arc<State>) {
     let server_info;
     let read_state = state.clone();
     {
-        let accounts: tokio::sync::RwLockReadGuard<'_, Vec<Account>> =
-            read_state.accounts.read().await;
+        let sockets: 
         server_info = json!( {
             "Time": SystemTime::now().get_timestamp_in_milliseconds(),
             "OnlinePlayers": accounts.len(),
