@@ -1,6 +1,9 @@
 use std::time::{SystemTime, UNIX_EPOCH};
+use std::sync::Arc;
 
-use crate::common::config::SERVER_ACCOUNT_EMAIL_REGEX;
+use socketioxide::extract::SocketRef;
+
+use crate::common::config::{types::Account, SERVER_ACCOUNT_EMAIL_REGEX};
 
 pub fn is_valid_mail(mail: &str) -> bool {
     if !SERVER_ACCOUNT_EMAIL_REGEX.is_match(mail) {
@@ -29,4 +32,12 @@ impl Utils for SystemTime {
             .map(|d| d.as_millis())
             .unwrap_or(0) as i64
     }
+}
+
+async fn attach_account_to_socket(socket: SocketRef, account: &mut Arc<Account>) {
+    socket.req_parts().extensions.get_mut::<Arc<Account>>().insert(account);
+}
+
+fn get_account_from_socket(socket: &SocketRef) -> Option<Arc<Account>> {
+    socket.req_parts().extensions.get::<Arc<Account>>().cloned()
 }
