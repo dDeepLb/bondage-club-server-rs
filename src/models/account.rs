@@ -1,21 +1,15 @@
-use std::{collections::HashSet, net::IpAddr, time::SystemTime};
+use std::collections::HashSet;
 
-use mongodb::Database;
-use ordermap::{OrderMap, OrderSet};
-use serde::{self, Deserialize, Serialize};
+// use mongodb::Database;
+// use ordermap::{OrderMap, OrderSet};
+// use serde::{self, Deserialize, Serialize};
 use serde_json::Value;
-use socketioxide::{extract::SocketRef, socket::Sid};
-use tokio::sync::RwLock;
+// use socketioxide::{extract::SocketRef, socket::Sid};
+// use tokio::sync::RwLock;
 
-#[derive(Debug, Deserialize)]
-pub struct AppConfig {
-    pub server_addr: String,
-    pub db_uri: String,
-    pub db_name: String,
-    pub db_collection: String,
-    pub max_ip_account_per_day: u32,
-    pub max_ip_account_per_hour: u32,
-}
+use crate::common::constants::SERVER_ACCOUNT_EMAIL_REGEX;
+use serde::{Deserialize, Serialize};
+use socketioxide::extract::SocketRef;
 
 /*
 #[derive(Debug, Deserialize, Serialize, Clone)]
@@ -86,25 +80,22 @@ pub struct Account {
     pub log: Option<Vec<Value>>,
 }
 
-#[derive(Debug, PartialEq, Eq)]
-pub struct AccountCreationIP {
-    pub address: IpAddr,
-    pub time: SystemTime,
-}
-#[derive(Debug, Clone)]
-pub struct LoginQueueStruct {
-    pub socket: SocketRef,
-    pub account_name: String,
-    pub password: String,
-}
-#[derive(Debug)]
-pub struct State {
-    pub db: Database,
-    pub next_member_number: RwLock<u32>,
-    pub account_creation_ip: RwLock<Vec<AccountCreationIP>>,
-    pub accounts: RwLock<Vec<Account>>,
-    pub login_queue: RwLock<OrderMap<Sid, LoginQueueStruct>>,
-    pub pending_logins: RwLock<OrderSet<Sid>>,
+impl Account {
+    pub fn is_valid_mail(mail: &str) -> bool {
+        if !SERVER_ACCOUNT_EMAIL_REGEX.is_match(mail) {
+            return false;
+        }
+
+        let parts: Vec<&str> = mail.split("@").collect();
+
+        if parts.len() != 2 {
+            return false;
+        };
+        if !parts[1].contains(".") {
+            return false;
+        };
+        true
+    }
 }
 
 #[derive(Deserialize, Serialize)]
