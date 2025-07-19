@@ -1,4 +1,5 @@
 use std::{
+    collections::HashSet,
     net::SocketAddr,
     sync::Arc,
     time::{Duration, SystemTime},
@@ -126,9 +127,9 @@ pub async fn on_account_create(
             member_number: *next_member_number,
             //Lovership: [],
             item_permission: 2,
-            friend_list: [].to_vec(),
-            white_list: [].to_vec(),
-            black_list: [].to_vec(),
+            friend_list: HashSet::new(),
+            white_list: HashSet::new(),
+            black_list: HashSet::new(),
             money: 100,
             creation: SystemTime::now().get_timestamp_in_milliseconds(),
             last_login: SystemTime::now().get_timestamp_in_milliseconds(),

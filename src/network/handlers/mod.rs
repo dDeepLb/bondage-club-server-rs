@@ -1,5 +1,7 @@
+mod account_beep;
 mod account_create;
 mod account_login;
+mod account_query;
 mod account_update;
 mod send_server_info;
 use axum::extract::ConnectInfo;
@@ -12,7 +14,8 @@ use std::{net::SocketAddr, sync::Arc};
 use crate::{
     common::config::types::State,
     network::handlers::{
-        account_create::on_account_create, account_login::on_account_login,
+        account_beep::account_beep, account_create::on_account_create,
+        account_login::on_account_login, account_query::account_query,
         account_update::account_update,
     },
 };
@@ -54,8 +57,15 @@ fn on_connect(
     socket.on("AccountLogin", async |data, socket| {
         on_account_login(data, socket, clone_state).await;
     });
-
+    let clone_state: Arc<State> = state.clone();
     socket.on("AccountUpdate", async |data, socket| {
-        account_update(data, socket, state).await;
+        account_update(data, socket, clone_state).await;
+    });
+    let clone_state: Arc<State> = state.clone();
+    socket.on("AccountBeep", async |data, socket| {
+        account_beep(data, socket, clone_state).await;
+    });
+    socket.on("AccountQuery", async |data, socket| {
+        account_query(data, socket, state).await;
     });
 }
