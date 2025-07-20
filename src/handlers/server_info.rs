@@ -3,7 +3,10 @@ use std::time::SystemTime;
 use serde_json::json;
 use socketioxide::extract::SocketRef;
 
-use crate::{server::BCServer, utilities::millis_timestamps::SystemTimeMillisTimestamps};
+use crate::{
+    server::BCServer,
+    utilities::{millis_timestamps::SystemTimeMillisTimestamps, socket_account::get_sockets},
+};
 
 impl BCServer {
     pub async fn emit_server_info(&self, socket: SocketRef) {
@@ -11,10 +14,10 @@ impl BCServer {
 
         let server_info;
         {
-            let accounts = self.accounts.lock().await;
+            let sockets = get_sockets(&self.io);
             server_info = json!( {
                 "Time": SystemTime::now().get_timestamp_in_milliseconds(),
-                "OnlinePlayers": accounts.len(),
+                "OnlinePlayers": sockets.len(),
             })
         }
         //if socket != None {

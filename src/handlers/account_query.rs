@@ -6,24 +6,21 @@ use crate::{
     common::protocol::AccountQueryRequest,
     models::account::{Account, ServerFriendInfo},
     server::BCServer,
+    utilities::socket_account::{get_account_from_socket, get_accounts},
 };
 
 impl BCServer {
     pub async fn on_account_query(&self, socket: SocketRef, request: AccountQueryRequest) {
         // Finds the current account
-        let accounts = self.accounts.lock().await;
-        let player = accounts
-            .iter()
-            .find(|a| a.id == Some(socket.id.to_string()));
-        if player.is_none() {
-            return;
-        }
-        let player = player.unwrap();
+        let accounts = get_accounts(&self.io);
+        let player = get_account_from_socket(&socket).unwrap();
+        let player = player.lock().unwrap();
         // OnlineFriends query - returns all friends that are online and the room name they are in
         if request.query == "OnlineFriends" {
             // Add all submissives owned by the player and all lovers of the players to the list
             let mut friends = vec![];
             for account in accounts.iter() {
+                let account = account.lock().unwrap();
                 let is_owned = account.ownership.is_some()
                     && account.ownership.as_ref().unwrap().member_number == player.member_number;
 
