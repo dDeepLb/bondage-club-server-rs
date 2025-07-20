@@ -1,7 +1,6 @@
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::HashSet;
-use utility_types::Partial;
 
 // #[derive(Debug, Clone, Deserialize)]
 // #[serde(tag = "event", content = "data")]
@@ -27,8 +26,7 @@ pub struct AccountLoginRequest {
     pub password: String,
 }
 
-#[derive(Deserialize, Serialize, Partial, Debug)]
-#[partial(ident = Account, derive(Debug, PartialEq), forward_attrs())]
+#[derive(Deserialize, Serialize, Debug)]
 #[serde(rename_all = "PascalCase")]
 pub struct AccountUpdateRequest {
     pub name: Option<String>,

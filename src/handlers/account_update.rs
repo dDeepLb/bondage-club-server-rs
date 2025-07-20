@@ -5,8 +5,7 @@ use mongodb::{
 use socketioxide::extract::SocketRef;
 
 use crate::{
-    common::protocol::{Account, AccountUpdateRequest},
-    server::BCServer,
+    common::protocol::AccountUpdateRequest, models::account::Account, server::BCServer,
     utilities::socket_account::get_account_from_socket,
 };
 
