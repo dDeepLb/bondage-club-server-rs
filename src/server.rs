@@ -27,7 +27,6 @@ use tokio::sync::{Mutex, RwLock};
 pub struct BCServer {
     pub config: AppConfig,
     pub db: Database,
-    pub accounts: Mutex<Vec<Account>>,
     pub next_member_number: RwLock<u32>,
     pub account_creation_ip: RwLock<Vec<AccountCreationIP>>,
     pub login_queue: RwLock<OrderMap<Sid, LoginQueueStruct>>,
@@ -90,7 +89,6 @@ impl BCServer {
         let server = Arc::new(Self {
             db,
             config,
-            accounts: Mutex::new(<Vec<Account>>::new()),
             next_member_number: RwLock::new(next_member_number),
             account_creation_ip: RwLock::new(<Vec<AccountCreationIP>>::new()),
             login_queue: RwLock::new(OrderMap::new()),

@@ -8,7 +8,9 @@ use crate::{
     },
     models::account::Account,
     server::BCServer,
-    utilities::millis_timestamps::SystemTimeMillisTimestamps,
+    utilities::{
+        millis_timestamps::SystemTimeMillisTimestamps, socket_account::attach_account_to_socket,
+    },
 };
 use axum::extract::ConnectInfo;
 use mongodb::bson::doc;
@@ -130,6 +132,7 @@ impl BCServer {
         //AccountValidData(account);
         //Account.push(account);
         //OnLogin(socket);
+        attach_account_to_socket(&socket, account.clone()).await;
 
         let _ = socket.emit(
             "CreationResponse",

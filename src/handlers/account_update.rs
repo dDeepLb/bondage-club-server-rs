@@ -7,20 +7,16 @@ use socketioxide::extract::SocketRef;
 use crate::{
     common::protocol::{Account, AccountUpdateRequest},
     server::BCServer,
+    utilities::socket_account::get_account_from_socket,
 };
 
 impl BCServer {
     pub async fn on_account_update(&self, socket: SocketRef, request: AccountUpdateRequest) {
         let mut update: Document = doc! {};
 
-        let mut accounts = self.accounts.lock().await;
-        let account = accounts
-            .iter_mut()
-            .find(|a| a.id == Some(socket.id.to_string()));
-        if account.is_none() {
-            return;
-        }
-        let account = account.unwrap();
+        let account = get_account_from_socket(&socket).unwrap();
+        let mut account = account.lock().unwrap();
+
         if let Some(log) = request.log.clone() {
             update.insert("Log", bson::to_bson(&log).unwrap());
             account.log = Some(log);

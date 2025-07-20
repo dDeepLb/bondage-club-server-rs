@@ -9,9 +9,12 @@ use crate::{
         protocol::AccountLoginRequest,
         types::LoginQueueStruct,
     },
-    models::account::Account,
+    models::account::{self, Account},
     server::BCServer,
-    utilities::millis_timestamps::SystemTimeMillisTimestamps,
+    utilities::{
+        millis_timestamps::SystemTimeMillisTimestamps,
+        socket_account::{attach_account_to_socket, get_account_from_member_number},
+    },
 };
 
 impl BCServer {
@@ -150,18 +153,13 @@ impl BCServer {
         // Disconnect duplicated logged accounts
         // FIXME: literally don't know, built on hopes
         {
-            let mut accounts = self.accounts.lock().await;
-            for (index, account) in accounts.iter().enumerate() {
-                if account.account_name == account_result.account_name {
-                    if account.socket.is_none() {
-                        continue;
-                    }
-                    let socket = account.socket.as_ref().unwrap();
-                    let _ = socket.emit("ForceDisconnect", "ErrorDuplicatedLogin");
-                    let _ = <socketioxide::extract::SocketRef as Clone>::clone(socket).disconnect();
-                    accounts.remove(index);
-                    break;
-                }
+            let account =
+                get_account_from_member_number(&self.io, account_result.member_number).unwrap();
+            let account = account.lock().unwrap();
+            if account.socket.is_some() {
+                let socket = account.socket.as_ref().unwrap();
+                let _ = socket.emit("ForceDisconnect", "ErrorDuplicatedLogin");
+                let _ = <socketioxide::extract::SocketRef as Clone>::clone(socket).disconnect();
             }
         }
 
@@ -181,8 +179,7 @@ impl BCServer {
         // AccountValidData(account_result)
         // AccountRemoveFromChatRoom(account_result.MemberNumber);
         {
-            let mut accounts = self.accounts.lock().await;
-            accounts.push(account_result.clone());
+            attach_account_to_socket(&socket, account_result.clone()).await;
         }
         //OnLogin(socket);
         let _ = socket.emit("LoginResponse", &account_result);
